@@ -1,0 +1,174 @@
+@import "tailwindcss";
+
+/*
+ * דירתי design tokens.
+ * Language: bright canvas, near-black ink, pale cloud-blue surfaces, soft sky
+ * gradients. The signature is the arched window (the shape of the logo) and
+ * one warm "window light" accent, used sparingly: a lit window is a home.
+ */
+@theme {
+  --color-canvas: #ffffff;
+  --color-ink: #0c0e13;
+  --color-ink-2: #3b404b;
+  --color-ink-3: #6b717d;
+  --color-line: rgb(12 14 19 / 0.08);
+
+  --color-cloud: #f2f6fa;
+  --color-cloud-2: #e7eef6;
+  --color-sky-1: #d7e6f5;
+  --color-sky-2: #b9d2ec;
+  --color-sky-3: #8fb4dc;
+
+  /* Window light. Decorative only (below 4.5:1 on white). */
+  --color-glow: #f3a15c;
+  --color-glow-soft: #fde6cf;
+  /* Text-safe warm accent (4.6:1 on white). */
+  --color-ember: #b4531a;
+
+  --color-sand: #faf5ef;
+  --color-sand-2: #f3e9dd;
+
+  --color-night: #0e1117;
+  --color-night-2: #171b23;
+
+  --font-sans: var(--font-he), var(--font-latin), system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+
+  --radius-card: 28px;
+  --radius-panel: 40px;
+
+  --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
+
+  --breakpoint-xs: 25rem;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* `clip` (not `hidden`) so position: sticky keeps working. */
+  html,
+  body {
+    overflow-x: clip;
+  }
+
+  body {
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-feature-settings: "kern";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background: var(--color-sky-1);
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 3px;
+    border-radius: 999px;
+  }
+
+  [id] {
+    scroll-margin-top: 96px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+}
+
+@layer components {
+  /* Display type: condensed width reads editorial in Hebrew and saves line length. */
+  .display {
+    font-stretch: 87.5%;
+    font-weight: 560;
+    letter-spacing: -0.025em;
+    line-height: 0.98;
+    text-wrap: balance;
+  }
+
+  .lede {
+    font-size: clamp(1.0625rem, 0.98rem + 0.35vw, 1.25rem);
+    line-height: 1.6;
+    color: var(--color-ink-2);
+    text-wrap: pretty;
+  }
+
+  .eyebrow {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-ink-3);
+  }
+
+  /*
+   * The arched window. Needs a fixed aspect ratio so the vertical radius
+   * (set through --arch-v, as a % of height) makes a true semicircle top.
+   * vertical % = (width / 2) / height = 50% * aspect-ratio.
+   */
+  .arch {
+    --arch-base: 28px;
+    border-radius: 50% 50% var(--arch-base) var(--arch-base) / var(--arch-v, 40%) var(--arch-v, 40%)
+      var(--arch-base) var(--arch-base);
+  }
+
+  .sky {
+    background:
+      radial-gradient(120% 70% at 50% 100%, rgb(255 255 255 / 0.9) 0%, rgb(255 255 255 / 0) 60%),
+      linear-gradient(180deg, var(--color-sky-2) 0%, var(--color-sky-1) 45%, #eef4fa 100%);
+  }
+
+  .dusk {
+    background:
+      radial-gradient(90% 60% at 50% 100%, rgb(253 230 207 / 0.95) 0%, rgb(253 230 207 / 0) 70%),
+      linear-gradient(180deg, #c9d9ec 0%, #e6e4ea 55%, #f7e7d6 100%);
+  }
+
+  .hairline {
+    box-shadow: inset 0 0 0 1px var(--color-line);
+  }
+}
+
+/*
+ * Reduced motion: scroll-linked transforms are decoration, so they are frozen.
+ * Opacity changes that carry meaning (which step is active) stay.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .fx {
+    transform: none !important;
+  }
+  .fx-fade {
+    opacity: 1 !important;
+  }
+}
+
+/* First-paint entrance for the hero. Pure CSS so it runs before hydration. */
+@keyframes enter-rise {
+  from {
+    opacity: 0;
+    transform: translateY(var(--enter-y, 28px));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.enter {
+  animation: enter-rise 1.1s var(--ease-soft) both;
+  animation-delay: var(--d, 0ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .enter {
+    animation: none;
+  }
+}
